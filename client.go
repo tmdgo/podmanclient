@@ -8,6 +8,7 @@ import (
 	"github.com/containers/podman/v3/pkg/bindings"
 	"github.com/containers/podman/v3/pkg/bindings/containers"
 	"github.com/containers/podman/v3/pkg/bindings/images"
+	"github.com/containers/podman/v3/pkg/domain/entities"
 	"github.com/containers/podman/v3/pkg/specgen"
 	runtimespec "github.com/opencontainers/runtime-spec/specs-go"
 )
@@ -24,8 +25,8 @@ func (client *Client) Init(sock Sock) {
 	}
 }
 
-func (client *Client) PullImage(image string) (err error) {
-	_, err = images.Pull(client.connection, "image", nil)
+func (client *Client) PullImage(image Image) (err error) {
+	_, err = images.Pull(client.connection, image.Name, nil)
 	return
 }
 
@@ -65,5 +66,13 @@ func (client *Client) RunContainer(container Container) (err error) {
 		return
 	}
 	err = client.StartContainer(container)
+	return
+}
+
+func (client *Client) BuildImage(image Image) (err error) {
+	buildOptions := entities.BuildOptions{}
+	buildOptions.ContextDirectory = image.BuildContext
+	buildOptions.AdditionalTags = []string{image.Name}
+	_, err = images.Build(client.connection, []string{image.ContainerFile}, buildOptions)
 	return
 }

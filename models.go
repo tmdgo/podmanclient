@@ -22,3 +22,9 @@ type ContainerPortMapping struct {
 	Destination uint16
 	Protocol    string
 }
+
+type Image struct {
+	Name          string
+	BuildContext  string
+	ContainerFile string
+}
